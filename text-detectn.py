@@ -9,6 +9,7 @@ import threading
 import easyocr
 from gtts import gTTS
 import os
+import speech_recognition as sr
 from tkinter import PhotoImage
 from PIL import ImageTk, Image
 from tkinter import Tk, Label
@@ -122,12 +123,43 @@ def translate_text_button():
     translating = True
     translate_text()
 
+def recognize_and_search():
+    target_language = language_map[Output_lang.get()]
+    recognizer = sr.Recognizer()
+    try:
+        with sr.Microphone() as speech:
+            audio = recognizer.listen(speech)
+        word = recognizer.recognize_google(audio)
+        print("Recognized word:", word)
+        TextVar.delete("1.0", "end")  # Clear existing text
+        TextVar.insert("1.0", word)
+        myobj = gTTS(text=word, lang=target_language, slow=False)
+        temp_result = 'result.mp3'
+        myobj.save(temp_result)
+        # pygame.mixer.init()
+        # pygame.mixer.music.load(temp_result)
+        # pygame.mixer.music.play()
+        # while pygame.mixer.music.get_busy():
+        #     pygame.time.Clock().tick(10)
+        # pygame.mixer.quit()
+        os.remove(temp_result)
+    except sr.UnknownValueError:
+        print("Speech recognition could not understand audio.")
+    except sr.RequestError as e:
+        print("Could not request results from Google Speech Recognition service:", str(e))
+    except Exception as e:
+        print("An error occurred:", str(e))
+
+
 # Create the widgets for the GUI
 top_message = ttk.Label(Window, background="#E0F2F1", foreground="red" ,text="Click the 'Start Webcam' button to capture video from the webcam", style="TLabel")
 top_message.grid(row=0, column=0, columnspan=4, padx=10, pady=10)
 
-start_button = ttk.Button(Window, text="Start Webcam", command=webcam_and_detect, style="TButton")
-start_button.grid(row=1, column=0, columnspan=4, padx=10, pady=10)
+start_button = ttk.Button(Window, text="Image Translate", command=webcam_and_detect, style="TButton")
+start_button.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
+
+start_button = ttk.Button(Window, text="Speech Translate", command=recognize_and_search, style="TButton")
+start_button.grid(row=1, column=1, columnspan=10, padx=10, pady=10)
 
 Label(Window, background="#E0F2F1", text="Choose a Language:", font=("Arial", 14)).grid(row=2, column=0, padx=50, pady=10, sticky='w')
 InputLanguageChoiceMenu = OptionMenu(Window, Input_lang, *Languages)
