@@ -29,7 +29,6 @@ language_map = {'English': 'en','Hindi': 'hi','German': 'de','French': 'fr','Spa
     'Latin': 'la','Chinese': 'zh','Russian': 'ru','Italian': 'it','Korean': 'ko','Arabic': 'ar',
     'Igbo': 'ig','Yoruba': 'yo','Hausa': 'ha','Croatian': 'hr'}
  
-
 Input_lang = StringVar()
 Output_lang = StringVar()
 Input_lang.set('English')
@@ -42,6 +41,7 @@ style.configure("TLabel", font=("Arial", 14), foreground="#333", background = "#
 
 def resize_image(imagePath, new_width, new_height):
     img = Image.open(imagePath)
+    # img = Image.fromarray(image)
     resized_img = img.resize((new_width, new_height), Image.LANCZOS)
     return resized_img
 
@@ -67,7 +67,6 @@ def webcam_and_detect():
     webcam_thread = threading.Thread(target=start_webcam)
     webcam_thread.start()
 
-
 def ocr(image):
     reader = easyocr.Reader(your_languages)  # Specify the languages you want to support
     result = reader.readtext(image)
@@ -77,6 +76,7 @@ def ocr(image):
     for detection in result:
         detected_text += detection[1] + " "  # Concatenate the detected text
     return detected_text
+
 
 # Function to handle translation
 def translate_text():
@@ -136,12 +136,6 @@ def recognize_and_search():
         myobj = gTTS(text=word, lang=target_language, slow=False)
         temp_result = 'result.mp3'
         myobj.save(temp_result)
-        # pygame.mixer.init()
-        # pygame.mixer.music.load(temp_result)
-        # pygame.mixer.music.play()
-        # while pygame.mixer.music.get_busy():
-        #     pygame.time.Clock().tick(10)
-        # pygame.mixer.quit()
         os.remove(temp_result)
     except sr.UnknownValueError:
         print("Speech recognition could not understand audio.")
@@ -227,3 +221,42 @@ for row in range(9):
     Window.grid_rowconfigure(row, weight=1)
 
 Window.mainloop()
+
+
+
+
+
+
+# def webcam_and_detect():
+#     def start_webcam():
+#         camera = cv2.VideoCapture(0)
+#         while True:
+#             _, image = camera.read()
+#             cv2.imshow("Text Detection", image)
+#             resized_img1 = resize_image(image, 600, 400)
+#             detected_text = ocr(resized_img1)
+#             translate_text(detected_text)
+#             TextVar.delete("1.0", "end")
+#             TextVar.insert("1.0", detected_text)
+#             TextVar.set(detected_text)
+#             if cv2.waitKey(1) & 0xFF == 27:  # Press 'Esc' key to exit
+#                 break
+#         camera.release()
+#         cv2.destroyAllWindows()
+#     # Create a new thread to run the webcam capture in the background
+#     webcam_thread = threading.Thread(target=start_webcam)
+#     webcam_thread.start()
+
+# def ocr(image):
+#     reader = easyocr.Reader(your_languages)
+    
+#     # Convert the PIL Image to a NumPy array
+#     image_np = np.array(image)
+    
+#     result = reader.readtext(image_np)
+#     if not result:
+#         return "No text detected"
+#     detected_text = ""
+#     for detection in result:
+#         detected_text += detection[1] + " "
+#     return detected_text
